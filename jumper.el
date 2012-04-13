@@ -158,3 +158,5 @@
   (list
    (cons (kbd "M-.") 'jumper-jump-to-symbol)
    (cons (kbd "M-,") 'jumper-pop-definition-stack)))
+
+(provide 'jumper)
