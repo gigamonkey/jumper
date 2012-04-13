@@ -48,6 +48,7 @@
 ;; in your .emacs.
 
 (require 'cl)
+(require 'etags)
 
 (defvar *jumper-default-jumper-file* "JUMPER")
 
@@ -56,55 +57,41 @@
     "[^ ]+"
     "[^:]+"))
 
-(defun jumper-file-name-on-line ()
+(defun jumper-jump-to-symbol ()
+  "Jump to the definition of the symbol at the point."
   (interactive)
-  (let ((eol nil))
-    (save-excursion
-      (end-of-line)
-      (setf eol (point)))
-    (dolist (pattern *jumper-patterns*)
-      ;;(message "Checking pattern %s" pattern)
-      (save-excursion
-        (beginning-of-line)
-        (when (search-forward-regexp pattern eol t)
-          (let ((match (buffer-substring-no-properties (match-beginning 0) (match-end 0))))
-            ;;(message "Pattern %s matched: %s" pattern match)
-            (let ((name (expand-file-name match)))
-              (when (file-exists-p name)
-                (return name)))))))))
-
-;(defun jumper-ack-file ()
-;  (interactive)
-;  (let ((eol nil))
-;    (save-excursion
-;      (end-of-line)
-;      (setf eol (point)))
-;    (save-excursion
-;      (beginning-of-line)
-;      (when (search-forward-regexp "(\\d+):" eol t)
-;        (let ((match (buffer-substring-no-properties (match-beginning 1) (match-end 1))))
-;          ;;(message "Pattern %s matched: %s" pattern match)
-;         (let ((name (expand-file-name match)))
-;             (when (file-exists-p name)
-;                (return name)))))))))
+  (jumper-jump-to-def (symbol-name (symbol-at-point))))
 
 (defun jump-to-file ()
+  "Jump to the file we find named somewhere on the line."
   (interactive)
   (let ((file (jumper-file-name-on-line)))
     (if file
         (find-file file)
       (message "No file on line."))))
 
-(defvar *jumper-def-files* ())
-
-(defun jumper-add-def-file (file)
-  (push file *jumper-def-files*))
+(defun jumper-file-name-on-line ()
+  "Find a filename on the current line by matching our *jumper-patterns* against the whole line."
+  (let ((eol nil))
+    (save-excursion
+      (end-of-line)
+      (setf eol (point)))
+    (dolist (pattern *jumper-patterns*)
+      (save-excursion
+        (beginning-of-line)
+        (when (search-forward-regexp pattern eol t)
+          (let ((match (buffer-substring-no-properties (match-beginning 0) (match-end 0))))
+            (let ((name (expand-file-name match)))
+              (when (file-exists-p name)
+                (return name)))))))))
 
 (defun jumper-jump-to (file &optional line)
   "Jump to a particular file and, optionally, a particular line."
-  (when (file-exists-p file)
+  (cond
+   ((file-exists-p file)
     (find-file file)
-    (goto-line (or line 1))))
+    (goto-line (or line 1)))
+   (t (message "No file: %s" file))))
 
 (defun jumper-find-def-in-file (file name)
   (save-current-buffer
@@ -112,12 +99,11 @@
     (goto-char 0)
     (let ((case-fold-search nil))
       (search-forward-regexp (concat "^" name "\t")))
-    (jumper-line-as-string)))
-
-(defun jumper-def-location (file name)
-  (destructuring-bind (name source-file line)
-      (split-string (jumper-find-def-in-file file name) "\t")
-    (list (expand-file-name source-file (file-name-directory file)) (string-to-number line))))
+    (destructuring-bind (name source-file line)
+        (split-string (jumper-line-as-string) "\t")
+      (list
+       (expand-file-name source-file (file-name-directory file))
+       (string-to-number line)))))
 
 (defun jumper-line-as-string ()
   (save-excursion
@@ -127,7 +113,7 @@
       (buffer-substring-no-properties start (point)))))
 
 (defun jumper-jump-to-def (name)
-  (destructuring-bind (file line) (jumper-def-location (jumper-find-jumper-file) name)
+  (destructuring-bind (file line) (jumper-find-def-in-file (jumper-find-jumper-file) name)
     (jumper-push-definition-stack)
     (jumper-jump-to file line)))
 
@@ -148,25 +134,24 @@
   (and (file-exists-p f)
        (not (file-exists-p (file-name-as-directory f)))))
 
-(defun jumper-jump-to-symbol ()
-  (interactive)
-  (jumper-jump-to-def (symbol-name (symbol-at-point))))
-
-;;; Next two functions borrowed from SLIME
+;;; Next two functions based on code from from SLIME
 
 (defun jumper-push-definition-stack ()
   "Add point to find-tag-marker-ring."
-  (require 'etags)
   (cond
    ((featurep 'xemacs) (push-tag-mark))
    (t (ring-insert find-tag-marker-ring (point-marker)))))
 
-(defun jumper-pop-find-definition-stack ()
+(defun jumper-pop-definition-stack ()
   "Pop the edit-definition stack and goto the location."
   (interactive)
   (cond
    ((featurep 'xemacs) (pop-tag-mark nil))
    (t (pop-tag-mark))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Define a minor mode that can be used whenever we have JUMPER files
+;;; built.
 
 (define-minor-mode jumper-mode
   "Jump to definitions."
@@ -176,4 +161,4 @@
   :keymap
   (list
    (cons (kbd "M-.") 'jumper-jump-to-symbol)
-   (cons (kbd "M-,") 'jumper-pop-find-definition-stack)))
+   (cons (kbd "M-,") 'jumper-pop-definition-stack)))
