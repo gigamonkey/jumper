@@ -36,11 +36,20 @@
 ;;; SUCH DAMAGE.
 ;;;
 
-
 ;;; TODO: do something smart when there are multiple definitions for a
 ;;; name.
 
+
+;; To get the minor mode for whatever kinds of files you've generated
+;; JUMPER files for do something like:
+;;
+;;   (add-hook 'ruby-mode-hook 'jumper-mode)
+;;
+;; in your .emacs.
+
 (require 'cl)
+
+(defvar *jumper-default-jumper-file* "JUMPER")
 
 (defvar *jumper-patterns*
   '(".+"
@@ -118,9 +127,26 @@
       (buffer-substring-no-properties start (point)))))
 
 (defun jumper-jump-to-def (name)
-  (destructuring-bind (file line) (jumper-def-location "~/development/JUMPER" name)
+  (destructuring-bind (file line) (jumper-def-location (jumper-find-jumper-file) name)
     (jumper-push-definition-stack)
     (jumper-jump-to file line)))
+
+(defun jumper-up-dir (d)
+  (file-name-directory (directory-file-name d)))
+
+(defun jumper-find-jumper-file ()
+  (jumper-%find-jumper-file (buffer-file-name)))
+
+(defun jumper-%find-jumper-file (d)
+  (let ((filename (expand-file-name *jumper-default-jumper-file* d)))
+    (cond
+     ((jumper-is-file-p filename) filename)
+     ((string-equal d "/") nil)
+     (t (jumper-%find-jumper-file (jumper-up-dir d))))))
+
+(defun jumper-is-file-p (f)
+  (and (file-exists-p f)
+       (not (file-exists-p (file-name-as-directory f)))))
 
 (defun jumper-jump-to-symbol ()
   (interactive)
