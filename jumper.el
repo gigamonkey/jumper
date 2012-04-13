@@ -62,7 +62,7 @@
   (interactive)
   (jumper-jump-to-def (symbol-name (symbol-at-point))))
 
-(defun jump-to-file ()
+(defun jumper-jump-to-file ()
   "Jump to the file we find named somewhere on the line."
   (interactive)
   (let ((file (jumper-file-name-on-line)))
@@ -71,19 +71,15 @@
       (message "No file on line."))))
 
 (defun jumper-file-name-on-line ()
-  "Find a filename on the current line by matching our *jumper-patterns* against the whole line."
-  (let ((eol nil))
-    (save-excursion
-      (end-of-line)
-      (setf eol (point)))
+  "Find a filename on the current line by matching our
+*jumper-patterns* against the whole line."
+  (let ((line (jumper-line-as-string)))
     (dolist (pattern *jumper-patterns*)
-      (save-excursion
-        (beginning-of-line)
-        (when (search-forward-regexp pattern eol t)
-          (let ((match (buffer-substring-no-properties (match-beginning 0) (match-end 0))))
-            (let ((name (expand-file-name match)))
-              (when (file-exists-p name)
-                (return name)))))))))
+      (when (string-match pattern line)
+        (let ((match (substring line (match-beginning 0) (match-end 0))))
+          (let ((name (expand-file-name match)))
+            (when (file-exists-p name)
+              (return name))))))))
 
 (defun jumper-jump-to (file &optional line)
   "Jump to a particular file and, optionally, a particular line."
