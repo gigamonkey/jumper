@@ -15,8 +15,9 @@ Scala code. Here's how I generate my `JUMPER` file:
 Then the minor mode, `jumper-mode` provides bindings for `M-.` and
 `M-,` that allow you to jump to definitions and back. Put the file
 `jumper.el` in a directory that's in your `load-path` (or use
-`add-to-list` to add the directory its in to `load-path`) and  add these
-lines to your `.emacs` to enable this mode in Ruby and Scala code.
+`add-to-list` to add the directory it's in to `load-path`) and add
+these lines to your `.emacs` to enable this mode in Ruby and Scala
+code.
 
     (require 'jumper)
     (add-hook 'ruby-mode-hook 'jumper-mode)
