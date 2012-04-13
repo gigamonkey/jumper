@@ -2,7 +2,7 @@ This a stupid scheme for letting me jump around in source code since I
 can never seem to get TAGS files to work the way I want.
 
 The basic idea is this: create a file named `JUMPER` somewhere above
-most of you source with each line containing a name, file name,
+most of your source with each line containing a name, file name,
 line-number triple delimited by tabs. The scripts `rubydefs` and
 `scaladefs` provide a quick and dirty way to do this for Ruby and
 Scala code. Here's how I generate my `JUMPER` file:
