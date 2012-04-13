@@ -86,7 +86,7 @@
   (cond
    ((file-exists-p file)
     (find-file file)
-    (goto-line (or line 1)))
+    (when line (goto-line line)))
    (t (message "No file: %s" file))))
 
 (defun jumper-find-def-in-file (file name)
