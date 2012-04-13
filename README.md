@@ -3,14 +3,14 @@ can never seem to get TAGS files to work the way I want.
 
 The basic idea is this: create a file named `JUMPER` somewhere above
 most of you source with each line containing a name, filename,
-line-number triple delimited by tabs. The scripts `rubydefs.pl` and
-`scaladefs.pl` provide a quick and dirty way to do this for Ruby and
+line-number triple delimited by tabs. The scripts `rubydefs` and
+`scaladefs` provide a quick and dirty way to do this for Ruby and
 Scala code. Here's how I generate my `JUMPER` file:
 
     rm -f JUMPER
     touch JUMPER
-    find . -name '*.rb' | xargs ~/hacks/jumper/rubydefs.pl >> JUMPER
-    find . -name '*.scala' | xargs ~/hacks/jumper/scaladefs.pl >> JUMPER
+    find . -name '*.rb' | xargs ~/hacks/jumper/rubydefs >> JUMPER
+    find . -name '*.scala' | xargs ~/hacks/jumper/scaladefs >> JUMPER
 
 Then I add these two lines to my `.emacs`:
 
