@@ -24,8 +24,8 @@ code.
     (add-hook 'scala-mode-hook 'jumper-mode)
 
 Then in any Ruby or Scala file whenever the cursor is in or
-immediately after a symbol (e.g. the name of a function or class), I
-can hit `M-.` to jump to the definition. `M-,` pops back to where I
+immediately after a symbol (e.g. the name of a function or class), you
+can hit `M-.` to jump to the definition. `M-,` pops back to where you
 came from. (The locations are arranged in a stack so if you `M-.`
 several times, you can unwind with repeated applications of `M-,`.)
 
