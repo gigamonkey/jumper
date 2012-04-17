@@ -52,10 +52,12 @@
 
 (defvar *jumper-default-jumper-file* "JUMPER")
 
-(defvar *jumper-patterns*
-  '(".+"
-    "[^ ]+"
-    "[^:]+"))
+(defvar *jumper-patterns* ())
+
+(setq *jumper-patterns*
+  '("\\(.+\\)"
+    "[[:blank:]]*\\([^ ]+\\)"
+    "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]\\)"))
 
 (defun jumper-jump-to-symbol ()
   "Jump to the definition of the symbol at the point."
@@ -76,7 +78,7 @@
   (let ((line (jumper-line-as-string)))
     (dolist (pattern *jumper-patterns*)
       (when (string-match pattern line)
-        (let ((match (substring line (match-beginning 0) (match-end 0))))
+        (let ((match (match-string 1 line)))
           (let ((name (expand-file-name match)))
             (when (file-exists-p name)
               (return name))))))))
