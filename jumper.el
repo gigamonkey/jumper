@@ -57,7 +57,7 @@
 (setq *jumper-patterns*
   '("\\(.+\\)"
     "[[:blank:]]*\\([^ ]+\\)"
-    "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]\\)"))
+    "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]+\\)"))
 
 (defun jumper-jump-to-symbol ()
   "Jump to the definition of the symbol at the point."
@@ -65,23 +65,22 @@
   (jumper-jump-to-def (symbol-name (symbol-at-point))))
 
 (defun jumper-jump-to-file ()
-  "Jump to the file we find named somewhere on the line."
+  "Jump to the file we find named somewhere on the line by
+matching our *jumper-patterns* against the whole line."
   (interactive)
-  (let ((file (jumper-file-name-on-line)))
-    (if file
-        (find-file file)
-      (message "No file on line."))))
-
-(defun jumper-file-name-on-line ()
-  "Find a filename on the current line by matching our
-*jumper-patterns* against the whole line."
-  (let ((line (jumper-line-as-string)))
+  (let ((line (jumper-line-as-string))
+        (found nil))
     (dolist (pattern *jumper-patterns*)
       (when (string-match pattern line)
-        (let ((match (match-string 1 line)))
-          (let ((name (expand-file-name match)))
-            (when (file-exists-p name)
-              (return name))))))))
+        (let ((name (expand-file-name (match-string 1 line)))
+              (line-num (match-string 2 line)))
+          (when (file-exists-p name)
+            (setq found t)
+            (message "Found %s %s with %s" name line-num pattern)
+            (jumper-jump-to name (if line-num (string-to-number line-num) nil))))))
+    (unless found
+      (message "No file on line."))))
+
 
 (defun jumper-jump-to (file &optional line)
   "Jump to a particular file and, optionally, a particular line."
