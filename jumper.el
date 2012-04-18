@@ -57,8 +57,11 @@
 (setq *jumper-patterns*
   '("\\(.+\\)"
     "[[:blank:]]*\\([^ ]+\\)"
-    "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]+\\)"
-    "at \\([^ ]+\\) line \\([[:digit:]]+\\)[,.]" ;; Perl error message
+    "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]+\\)"      ; Ruby errors and grep -nr output
+    "from \\([^:]+\\):\\([[:digit:]]+\\)"             ; Ruby stack trace
+    "at \\([^ ]+\\) line \\([[:digit:]]+\\)[,.]"      ; Perl errors
+    "in \\([^ ]+\\) on line \\([[:digit:]]+\\)"       ; PHP errors
+    "File \"\\([^\"]+\\)\", line \\([[:digit:]]+\\)," ; Python stack trace
 ))
 
 (defun jumper-jump-to-symbol ()
@@ -88,6 +91,7 @@ matching our *jumper-patterns* against the whole line."
   "Jump to a particular file and, optionally, a particular line."
   (cond
    ((file-exists-p file)
+    (jumper-push-definition-stack)
     (find-file file)
     (when line (goto-line line)))
    (t (message "No file: %s" file))))
@@ -113,7 +117,6 @@ matching our *jumper-patterns* against the whole line."
 
 (defun jumper-jump-to-def (name)
   (destructuring-bind (file line) (jumper-find-def-in-file (jumper-find-jumper-file) name)
-    (jumper-push-definition-stack)
     (jumper-jump-to file line)))
 
 (defun jumper-up-dir (d)
@@ -153,13 +156,23 @@ matching our *jumper-patterns* against the whole line."
 ;;; built.
 
 (define-minor-mode jumper-mode
-  "Jump to definitions."
+  "Jump to definitions of the current symbol"
   nil
   :lighter " jmp"
   :global nil
   :keymap
   (list
    (cons (kbd "M-.") 'jumper-jump-to-symbol)
+   (cons (kbd "M-,") 'jumper-pop-definition-stack)))
+
+(define-minor-mode jumper-line-mode
+  "Jump to file locations based on the current line."
+  nil
+  :lighter " jmp"
+  :global nil
+  :keymap
+  (list
+   (cons (kbd "M-.") 'jumper-jump-to-file)
    (cons (kbd "M-,") 'jumper-pop-definition-stack)))
 
 (provide 'jumper)
