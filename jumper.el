@@ -57,7 +57,9 @@
 (setq *jumper-patterns*
   '("\\(.+\\)"
     "[[:blank:]]*\\([^ ]+\\)"
-    "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]+\\)"))
+    "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]+\\)"
+    "at \\([^ ]+\\) line \\([[:digit:]]+\\)[,.]" ;; Perl error message
+))
 
 (defun jumper-jump-to-symbol ()
   "Jump to the definition of the symbol at the point."
