@@ -82,10 +82,10 @@ matching our *jumper-patterns* against the whole line."
           (when (file-exists-p name)
             (setq found t)
             (message "Found %s %s with %s" name line-num pattern)
-            (jumper-jump-to name (if line-num (string-to-number line-num) nil))))))
+            (when (jumper-jump-to name (if line-num (string-to-number line-num) nil))
+              (local-set-key (kbd "M-,") 'jumper-pop-definition-stack))))))
     (unless found
       (message "No file on line."))))
-
 
 (defun jumper-jump-to (file &optional line)
   "Jump to a particular file and, optionally, a particular line."
@@ -93,8 +93,11 @@ matching our *jumper-patterns* against the whole line."
    ((file-exists-p file)
     (jumper-push-definition-stack)
     (find-file file)
-    (when line (goto-line line)))
-   (t (message "No file: %s" file))))
+    (when line (goto-line line))
+    t)
+   (t
+    (message "No file: %s" file)
+    nil)))
 
 (defun jumper-find-def-in-file (file name)
   (save-current-buffer
