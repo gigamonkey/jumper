@@ -57,7 +57,7 @@
 (setq *jumper-patterns*
   '("\\(.+\\)"
     "[[:blank:]]*\\([^ ]+\\)"
-    "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]+\\)"      ; Ruby errors and grep -nr output
+    "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]+\\)"      ; Ruby errors and grep -n output
     "from \\([^:]+\\):\\([[:digit:]]+\\)"             ; Ruby stack trace
     "at \\([^ ]+\\) line \\([[:digit:]]+\\)[,.]"      ; Perl errors
     "in \\([^ ]+\\) on line \\([[:digit:]]+\\)"       ; PHP errors
