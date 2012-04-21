@@ -87,13 +87,16 @@ matching our *jumper-patterns* against the whole line."
     (unless found
       (message "No file on line."))))
 
-(defun jumper-jump-to (file &optional line)
+(defun jumper-jump-to (file &optional line pattern)
   "Jump to a particular file and, optionally, a particular line."
   (cond
    ((file-exists-p file)
     (jumper-push-definition-stack)
     (find-file file)
-    (when line (goto-line line))
+    (when line
+      (goto-line line)
+      (re-search-forward pattern)
+      (goto-char (match-beginning 0)))
     t)
    (t
     (message "No file: %s" file)
@@ -120,7 +123,7 @@ matching our *jumper-patterns* against the whole line."
 
 (defun jumper-jump-to-def (name)
   (destructuring-bind (file line) (jumper-find-def-in-file (jumper-find-jumper-file) name)
-    (jumper-jump-to file line)))
+    (jumper-jump-to file line name)))
 
 (defun jumper-up-dir (d)
   (file-name-directory (directory-file-name d)))
