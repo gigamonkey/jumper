@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+# usage: find . -name '*.php' | xargs rubydefs > JUMPER
+
+while (<>) {
+    /class (\w+)/ and print "$1\t$ARGV\t$.\n";
+    /(?:public )?(?:(?:static|final) )?function ([a-zA-Z_?!]+)/ and print "$1\t$ARGV\t$.\n";
+
+} continue {
+    close ARGV if eof;
+}
+
+__END__

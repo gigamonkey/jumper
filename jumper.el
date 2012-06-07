@@ -55,13 +55,16 @@
 (defvar *jumper-patterns* ())
 
 (setq *jumper-patterns*
-  '("\\(.+\\)"
-    "[[:blank:]]*\\([^ ]+\\)"
+  '(
+    "[[:blank:]]+\\([^ :]+\\):\\([[:digit:]]+\\):"     ; Scala compile errors
     "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]+\\)"      ; Ruby errors and grep -n output
     "from \\([^:]+\\):\\([[:digit:]]+\\)"             ; Ruby stack trace
     "at \\([^ ]+\\) line \\([[:digit:]]+\\)[,.]"      ; Perl errors
     "in \\([^ ]+\\) on line \\([[:digit:]]+\\)"       ; PHP errors
     "File \"\\([^\"]+\\)\", line \\([[:digit:]]+\\)," ; Python stack trace
+    "\\(.+\\)"
+    "[[:blank:]]*\\([^ ]+\\)"
+    "[[:blank:]]*\\([^:]+\\):"
 ))
 
 (defun jumper-jump-to-symbol ()
@@ -160,6 +163,9 @@ matching our *jumper-patterns* against the whole line."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Define a minor mode that can be used whenever we have JUMPER files
 ;;; built.
+
+(defun jumper-mode-on () (jumper-mode t))
+(defun jumper-mode-on () (jumper-mode t))
 
 (define-minor-mode jumper-mode
   "Jump to definitions of the current symbol"
