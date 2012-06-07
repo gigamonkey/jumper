@@ -98,8 +98,9 @@ matching our *jumper-patterns* against the whole line."
     (find-file file)
     (when line
       (goto-line line)
-      (re-search-forward pattern)
-      (goto-char (match-beginning 0)))
+      (when pattern
+        (re-search-forward pattern)
+        (goto-char (match-beginning 0))))
     t)
    (t
     (message "No file: %s" file)
