@@ -88,13 +88,12 @@
 
 
 (defun jumper-update-defs-in-jumper-file (jumper-file file-name defs)
-  (set-buffer (find-file-noselect jumper-file))
-  (beginning-of-buffer)
-  (flush-lines file-name)
-  (end-of-buffer)
-  (insert defs)
-  (save-buffer)
-  )
+    (set-buffer (find-file-noselect jumper-file))
+    (goto-char (point-min))
+    (flush-lines file-name)
+    (goto-char (point-max))
+    (insert defs)
+    (save-buffer))
 
 
 (provide 'jumper-update)
