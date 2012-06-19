@@ -70,7 +70,7 @@
 
 (defun jumper-update-defs-from-current-buffer ()
   (interactive)
-  (let* ((file-name (buffer-file-name))
+  (let* ((file-name (file-truename (buffer-file-name)))
 	 (buffer-with-defs (current-buffer))
 	 (def-regex (cdr (assoc major-mode *jumper-update-mode-to-def-regex-list*)))
 	 (jumper-file (jumper-find-jumper-file)))
