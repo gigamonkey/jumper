@@ -43,7 +43,7 @@
 (defvar *jumper-update-mode-to-def-regex-list* ())
 (setq *jumper-update-mode-to-def-regex-list*
       '(
-	(python-mode . "^[	]*\\(def\\|class\\) \\([_A-Za-z][_A-Za-z1-9]*\\)(.*")
+	(python-mode . ("^[	]*\\(def\\|class\\) \\([_A-Za-z][_A-Za-z1-9]*\\)(.*" . 2))
 	))
 
 
@@ -53,13 +53,15 @@
 
 
 (defun jumper-update-strip-buffer-to-defs (def-regex)
-  (let ((line-number 0))
+  (let ((line-number 0)
+	(regex (car def-regex))
+	(replace-str (format "\\%s" (cdr def-regex))))
     (while (not (eobp))
       (setq line-number (1+ line-number))
       (beginning-of-line)
-      (if (re-search-forward def-regex (point-at-eol) t)
+      (if (re-search-forward regex (point-at-eol) t)
 	  (progn
-	    (replace-match "\\2" nil nil)
+	    (replace-match replace-str nil nil)
 	    (end-of-line)
 	    (insert (format "	%s	%s" file-name line-number))
 	    (forward-line))
