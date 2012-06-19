@@ -49,7 +49,7 @@
 
 (defun jumper-update-log (str)
   (when *jumper-update-debug*
-      (message str)))
+      (message (replace-regexp-in-string "%" "%%" str))))
 
 
 (defun jumper-update-strip-buffer-to-defs (def-regex)
