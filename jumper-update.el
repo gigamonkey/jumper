@@ -58,11 +58,11 @@
 	(replace-str (format "\\%s" (cdr def-regex))))
     (while (not (eobp))
       (setq line-number (1+ line-number))
-      (beginning-of-line)
+      (goto-char (point-at-bol))
       (if (re-search-forward regex (point-at-eol) t)
 	  (progn
 	    (replace-match replace-str nil nil)
-	    (end-of-line)
+	    (goto-char (point-at-eol))
 	    (insert (format "	%s	%s" file-name line-number))
 	    (forward-line))
 	(let ((kill-whole-line t))
@@ -79,7 +79,7 @@
     (when (and def-regex jumper-file)
       (with-temp-buffer
 	(insert-buffer-substring buffer-with-defs)
-	(beginning-of-buffer)
+	(goto-char (point-min))
 	(jumper-update-strip-buffer-to-defs def-regex)
 	(jumper-update-log (format "Found defs: \n%s" (buffer-substring (point-min) (point-max))))
 	(jumper-update-defs-in-jumper-file
