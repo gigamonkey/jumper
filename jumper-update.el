@@ -91,7 +91,7 @@
       (jumper-update-defify-or-delete-line def-regexs file-name line-number)
       (forward-line 1))
     (goto-char (point-min))
-    (flush-lines "^[        ]*$")))
+    (flush-lines "^[[:blank:]]*$")))
 
 
 (defun jumper-update-defs-from-current-buffer ()
