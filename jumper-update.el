@@ -36,6 +36,9 @@
 ;;; SUCH DAMAGE.
 ;;;
 
+(defvar *jumper-update-debug* nil)
+(setq *jumper-update-debug* nil)
+
 
 (defvar *jumper-update-mode-to-def-regex-list* ())
 (setq *jumper-update-mode-to-def-regex-list*
@@ -44,17 +47,25 @@
 	))
 
 
-(defvar *jumper-update-line-extra-info-regex* "")
-(setq *jumper-update-line-extra-info-regex* "\\(	.+	[0-9]+\\)$")
+(defun jumper-update-log (str)
+  (when *jumper-update-debug*
+      (message str)))
 
 
-(defun jumper-update-add-lines-and-file-names ()
-  (let ((line-number 1))
+(defun jumper-update-strip-buffer-to-defs (def-regex)
+  (let ((line-number 0))
     (while (not (eobp))
-      (end-of-line)
-      (insert (format "	%s	%s" file-name line-number))
       (setq line-number (1+ line-number))
-      (forward-line))))
+      (beginning-of-line)
+      (if (re-search-forward def-regex (point-at-eol) t)
+	  (progn
+	    (replace-match "\\2" nil nil)
+	    (end-of-line)
+	    (insert (format "	%s	%s" file-name line-number))
+	    (forward-line))
+	(let ((kill-whole-line t))
+	  (kill-line)))
+      )))
 
 
 (defun jumper-update-defs-from-current-buffer ()
@@ -62,18 +73,13 @@
   (let* ((file-name (buffer-file-name))
 	 (buffer-with-defs (current-buffer))
 	 (def-regex (cdr (assoc major-mode *jumper-update-mode-to-def-regex-list*)))
-	 (line-regex (concat def-regex *jumper-update-line-extra-info-regex*))
 	 (jumper-file (jumper-find-jumper-file)))
     (when (and def-regex jumper-file)
       (with-temp-buffer
 	(insert-buffer-substring buffer-with-defs)
 	(beginning-of-buffer)
-	(save-excursion (jumper-update-add-lines-and-file-names))
-	(save-excursion (keep-lines line-regex))
-	(message (buffer-substring (point-min) (point-max)))
-	(while (re-search-forward line-regex nil t)
-	  (replace-match "\\2\\3" nil nil))
-	(message (buffer-substring (point-min) (point-max)))
+	(jumper-update-strip-buffer-to-defs def-regex)
+	(jumper-update-log (format "Found defs: \n%s" (buffer-substring (point-min) (point-max))))
 	(jumper-update-defs-in-jumper-file
 	 jumper-file
 	 file-name
