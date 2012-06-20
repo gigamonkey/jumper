@@ -35,6 +35,22 @@
 ;;; THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 ;;; SUCH DAMAGE.
 ;;;
+;;; Usage:
+;;;
+;;; Use `jumper-update-defs-from-current-buffer' to update your jumper
+;;; file with defs found in the current buffer. For example:
+;;;
+;;;     (add-hook 'before-save-hook 'jumper-update-defs-from-current-buffer)
+;;;
+;;; This way your defs are updated automatically whenever you save a file.
+;;;
+;;; The `*jumper-update-mode-to-def-regex-list*' holds a mapping from
+;;; major-mode names to lists of pairs of a regular expression and the
+;;; number of the def's group in this regular expression. It is used
+;;; to identify defs in the current buffer and should be extended as
+;;; desired.
+;;;
+
 
 (defvar *jumper-update-debug* nil)
 (setq *jumper-update-debug* nil)
