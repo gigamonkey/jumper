@@ -79,7 +79,7 @@
   (jumper-update-log "Replacing a found def and adding location info.")
   (replace-match replace-str nil nil)
   (goto-char (point-at-eol))
-  (insert (format "       %s      %s" file-name line-number)))
+  (insert (format "\t%s\t%s" file-name line-number)))
 
 
 (defun jumper-update-current-line ()
