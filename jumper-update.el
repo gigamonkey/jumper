@@ -59,9 +59,9 @@
 (defvar *jumper-update-mode-to-def-regex-list* ())
 (setq *jumper-update-mode-to-def-regex-list*
       '(
-        (python-mode . (("^[  ]*\\(def\\|class\\) \\([_A-Za-z][_A-Za-z1-9]*\\)(.*$" . 2)))
-        (js2-mode . (("^[     ]*Ext.define(.+\\.\\([_A-Za-z][^'\"]*\\).*$" . 1)
-                     ("^[	]*\\([_A-Za-z][_A-Za-z1-9]*\\): function.*$" . 1)))
+        (python-mode . (("^[[:blank:]]*\\(def\\|class\\) \\([_A-Za-z][_A-Za-z1-9]*\\)(.*$" . 2)))
+        (js2-mode . (("^[[:blank:]]*Ext.define(.+\\.\\([_A-Za-z][^'\"]*\\).*$" . 1)
+                     ("^[[:blank:]]*\\([_A-Za-z][_A-Za-z1-9]*\\): function.*$" . 1)))
         ))
 
 
