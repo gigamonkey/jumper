@@ -62,6 +62,7 @@
         (python-mode . (("^[[:blank:]]*\\(def\\|class\\) \\([_A-Za-z][_A-Za-z1-9]*\\)(.*$" . 2)))
         (js2-mode . (("^[[:blank:]]*Ext.define(.+\\.\\([_A-Za-z][^'\"]*\\).*$" . 1)
                      ("^[[:blank:]]*\\([_A-Za-z][_A-Za-z1-9]*\\): function.*$" . 1)))
+        (makefile-mode . (("^\\([[:alnum:]{}()_]+\\)::?.*$" . 1)))
         ))
 
 
