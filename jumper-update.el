@@ -66,6 +66,14 @@
         ))
 
 
+(defvar *jumper-update-excludes* nil)
+(setq *jumper-update-excludes* '("/ssh:" "/tmp" "/sudo:"))
+
+
+(defun jumper-update-include-p (file-name)
+  (loop for exclude in *jumper-update-excludes* never (string-match exclude file-name)))
+
+
 (defun jumper-update-log (str)
   (when *jumper-update-debug*
     (message (replace-regexp-in-string "%" "%%" str))))
@@ -113,21 +121,22 @@
 
 (defun jumper-update-defs-from-current-buffer ()
   (interactive)
-  (let* ((file-name (file-truename (buffer-file-name)))
-         (buffer-with-defs (current-buffer))
-         (def-regexs (cdr (assoc major-mode *jumper-update-mode-to-def-regex-list*)))
-         (jumper-file (jumper-find-jumper-file)))
-    (when (and def-regexs jumper-file)
-      (with-temp-buffer
-        (insert-buffer-substring buffer-with-defs)
-        (goto-char (point-min))
-        (jumper-update-strip-buffer-to-defs def-regexs file-name)
-        (jumper-update-log (format "Found defs: \n[%s]" (buffer-substring (point-min) (point-max))))
-        (jumper-update-defs-in-jumper-file
-         jumper-file
-         file-name
-         (buffer-substring (point-min) (point-max)))
-        ))))
+  (let ((file-name (file-truename (buffer-file-name))))
+    (when (jumper-update-include-p file-name)
+      (let ((buffer-with-defs (current-buffer))
+            (def-regexs (cdr (assoc major-mode *jumper-update-mode-to-def-regex-list*)))
+            (jumper-file (jumper-find-jumper-file)))
+        (when (and def-regexs jumper-file)
+          (with-temp-buffer
+            (insert-buffer-substring buffer-with-defs)
+            (goto-char (point-min))
+            (jumper-update-strip-buffer-to-defs def-regexs file-name)
+            (jumper-update-log (format "Found defs: \n[%s]" (buffer-substring (point-min) (point-max))))
+            (jumper-update-defs-in-jumper-file
+             jumper-file
+             file-name
+             (buffer-substring (point-min) (point-max)))
+            ))))))
 
 
 (defun jumper-update-defs-in-jumper-file (jumper-file file-name defs)
