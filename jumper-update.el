@@ -67,7 +67,7 @@
 
 
 (defvar *jumper-update-excludes* nil)
-(setq *jumper-update-excludes* '("/ssh:" "/tmp" "/sudo:"))
+(setq *jumper-update-excludes* '("/ssh:" "/tmp" "/sudo:" "/scpc:"))
 
 
 (defun jumper-update-include-p (file-name)
