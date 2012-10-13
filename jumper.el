@@ -62,6 +62,7 @@
     "at \\([^ ]+\\) line \\([[:digit:]]+\\)[,.]"      ; Perl errors
     "in \\([^ ]+\\) on line \\([[:digit:]]+\\)"       ; PHP errors
     "File \"\\([^\"]+\\)\", line \\([[:digit:]]+\\)," ; Python stack trace
+    "#[[:blank:]]+modified:[[:blank:]]+\\(.+\\)"                       ; git status
     "\\(.+\\)"
     "[[:blank:]]*\\([^ ]+\\)"
     "[[:blank:]]*\\([^:]+\\):"
