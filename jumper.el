@@ -56,13 +56,13 @@
 
 (setq *jumper-patterns*
   '(
-    "[[:blank:]]+\\([^ :]+\\):\\([[:digit:]]+\\):"     ; Scala compile errors
-    "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]+\\)"      ; Ruby errors and grep -n output
-    "from \\([^:]+\\):\\([[:digit:]]+\\)"             ; Ruby stack trace
-    "at \\([^ ]+\\) line \\([[:digit:]]+\\)[,.]"      ; Perl errors
-    "in \\([^ ]+\\) on line \\([[:digit:]]+\\)"       ; PHP errors
-    "File \"\\([^\"]+\\)\", line \\([[:digit:]]+\\)," ; Python stack trace
-    "#[[:blank:]]+modified:[[:blank:]]+\\(.+\\)"                       ; git status
+    "[[:blank:]]+\\([^ :]+\\):\\([[:digit:]]+\\):"                           ; Scala compile errors
+    "[[:blank:]]*\\([^:]+\\):\\([[:digit:]]+\\)"                             ; Ruby errors and grep -n output
+    "from \\([^:]+\\):\\([[:digit:]]+\\)"                                    ; Ruby stack trace
+    "at \\([^ ]+\\) line \\([[:digit:]]+\\)[,.]"                             ; Perl errors
+    "in \\([^ ]+\\) on line \\([[:digit:]]+\\)"                              ; PHP errors
+    "File \"\\([^\"]+\\)\", line \\([[:digit:]]+\\),"                        ; Python stack trace
+    "#[[:blank:]]+\\(?:\\(?:modified\\|new file\\):[[:blank:]]+\\)?\\(.+\\)" ; git status
     "\\(.+\\)"
     "[[:blank:]]*\\([^ ]+\\)"
     "[[:blank:]]*\\([^:]+\\):"
