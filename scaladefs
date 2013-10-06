@@ -3,10 +3,10 @@
 use warnings;
 use strict;
 
-# usage: find . -name '*.scala' | xargs scaladefs.pl >> JUMPER
+# usage: find . -name '*.scala' | xargs scaladefs >> JUMPER
 
 while (<>) {
-    /(?:class|object|def) ([a-zA-Z_]+)/ and print "$1\t$ARGV\t$.\n";
+    /(?:class|object|def|trait) ([a-zA-Z_]+)/ and print "$1\t$ARGV\t$.\n";
 
 } continue {
     close ARGV if eof;
