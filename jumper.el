@@ -52,6 +52,8 @@
 
 (defvar *jumper-default-jumper-file* "JUMPER")
 
+(defvar *jumper-grep-dir* (expand-file-name "~/git/ensime/src/main/"))
+
 (defvar *jumper-patterns* ())
 
 (setq *jumper-patterns*
@@ -80,7 +82,7 @@ matching our *jumper-patterns* against the whole line."
   (let ((line (jumper-line-as-string))
         (found nil))
     (dolist (pattern *jumper-patterns*)
-      (when (string-match pattern line)
+      (when (and (not found) (string-match pattern line))
         (let ((name (expand-file-name (match-string 1 line)))
               (line-num (match-string 2 line)))
           (when (file-exists-p name)
@@ -106,6 +108,34 @@ matching our *jumper-patterns* against the whole line."
    (t
     (message "No file: %s" file)
     nil)))
+
+
+(defun jumper-grep (prefix)
+  "Grep for a pattern recursively under the current *jumper-grep-dir*"
+  (interactive "p")
+  (let ((pattern
+         (cond
+          ((= prefix 1)
+           (let ((sym (symbol-at-point)))
+             (if sym (symbol-name sym) (read-from-minibuffer "Pattern: "))))
+          ((= prefix 4) (read-from-minibuffer "Pattern: ")))))
+    (let ((bufname "*jumper-grep*"))
+      (jumper-push-definition-stack)
+      (switch-to-buffer bufname)
+      (erase-buffer)
+      (call-process "grep" nil bufname t "-Isnr" pattern *jumper-grep-dir*)
+      (jumper-line-mode)
+      (goto-char (point-min))
+      (local-set-key (kbd "q") (lambda ()
+                                 (interactive)
+                                 (let ((kill-buffer-query-functions ()))
+                                   (kill-buffer)))))))
+
+
+(defun jumper-cd (dir)
+  "Change the root directory for jumper-grep"
+  (interactive "DRoot directory: ")
+  (message "Jumper grep dir: %s" (setq *jumper-grep-dir* (expand-file-name dir))))
 
 (defun jumper-find-def-in-file (file name)
   (save-current-buffer
@@ -166,7 +196,6 @@ matching our *jumper-patterns* against the whole line."
 ;;; Define a minor mode that can be used whenever we have JUMPER files
 ;;; built.
 
-(defun jumper-mode-on () (jumper-mode t))
 (defun jumper-mode-on () (jumper-mode t))
 
 (define-minor-mode jumper-mode
