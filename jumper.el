@@ -65,6 +65,9 @@
     "in \\([^ ]+\\) on line \\([[:digit:]]+\\)"                              ; PHP errors
     "File \"\\([^\"]+\\)\", line \\([[:digit:]]+\\)"                        ; Python stack trace
     "#[[:blank:]]+\\(?:\\(?:modified\\|new file\\):[[:blank:]]+\\)?\\(.+\\)" ; git status
+    "^diff --git a/\\(.*\\) b"                                               ; git diff
+    "^--- a/\\(.*\\)"                                                        ; git diff
+    "^\+\+\+ b/\\(.*\\)"                                                     ;git diff
     "\\(.+\\)"
     "[[:blank:]]*\\([^ \t]+\\)"
     "[[:blank:]]*\\([^:]+\\):"
@@ -75,7 +78,7 @@
   (interactive)
   (jumper-jump-to-def (symbol-name (symbol-at-point))))
 
-(defun jumper-jump-to-file ()
+(defun xjumper-jump-to-file ()
   "Jump to the file we find named somewhere on the line by
 matching our *jumper-patterns* against the whole line."
   (interactive)
@@ -92,6 +95,37 @@ matching our *jumper-patterns* against the whole line."
               (local-set-key (kbd "M-,") 'jumper-pop-definition-stack))))))
     (unless found
       (message "No file on line."))))
+
+(defun jumper-jump-to-file ()
+  "Jump to the file we find named somewhere on the line by
+matching our *jumper-patterns* against the whole line. Start
+searching in the current directory and then work our way up."
+  (interactive)
+  (let ((dir default-directory)
+        (found nil))
+    (while (and dir (not found))
+      (setf found (jumper-jump-to-file-in-dir dir))
+      (setf dir (jumper-updir dir)))
+    (unless found
+      (message "No file on line."))))
+
+(defun jumper-jump-to-file-in-dir (dir)
+  (let ((line (jumper-line-as-string))
+        (found nil))
+    (dolist (pattern *jumper-patterns*)
+      (when (and (not found) (string-match pattern line))
+        (let ((name (expand-file-name (match-string 1 line) dir))
+              (line-num (match-string 2 line)))
+          (when (file-exists-p name)
+            (setq found t)
+            (message "Found %s %s with %s" name line-num pattern)
+            (when (jumper-jump-to name (if line-num (string-to-number line-num) nil))
+              (local-set-key (kbd "M-,") 'jumper-pop-definition-stack))))))
+    found))
+
+(defun jumper-updir (dir)
+  (unless (equal dir "/")
+    (file-name-directory (directory-file-name dir))))
 
 (defun jumper-jump-to (file &optional line pattern)
   "Jump to a particular file and, optionally, a particular line."

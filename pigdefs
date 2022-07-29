@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+# usage: find . -name '*.piglet' -o -name '*.macro' -o -name '*.yml' | xargs pigdefs > JUMPER
+
+while (<>) {
+    /define (\w+)/i and print "$1\t$ARGV\t$.\n";
+    /load_as: (\w+)/ and print "$1\t$ARGV\t$.\n";
+
+} continue {
+    close ARGV if eof;
+}
+
+__END__
