@@ -47,7 +47,7 @@
 ;;
 ;; in your .emacs.
 
-(require 'cl)
+(require 'cl-lib)
 (require 'etags)
 
 (defvar *jumper-default-jumper-file* "JUMPER")
@@ -66,7 +66,7 @@
     "File \"\\([^\"]+\\)\", line \\([[:digit:]]+\\)"                        ; Python stack trace
     "#[[:blank:]]+\\(?:\\(?:modified\\|new file\\):[[:blank:]]+\\)?\\(.+\\)" ; git status
     "\\(.+\\)"
-    "[[:blank:]]*\\([^ ]+\\)"
+    "[[:blank:]]*\\([^ \t]+\\)"
     "[[:blank:]]*\\([^:]+\\):"
 ))
 
@@ -183,14 +183,16 @@ matching our *jumper-patterns* against the whole line."
   "Add point to find-tag-marker-ring."
   (cond
    ((featurep 'xemacs) (push-tag-mark))
-   (t (ring-insert find-tag-marker-ring (point-marker)))))
+   ;;(t (ring-insert find-tag-marker-ring (point-marker)))
+   (t (xref-push-marker-stack))
+   ))
 
 (defun jumper-pop-definition-stack ()
   "Pop the edit-definition stack and goto the location."
   (interactive)
   (cond
    ((featurep 'xemacs) (pop-tag-mark nil))
-   (t (pop-tag-mark))))
+   (t (xref-pop-marker-stack))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Define a minor mode that can be used whenever we have JUMPER files
